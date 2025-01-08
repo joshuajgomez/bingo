@@ -1,22 +1,13 @@
 package com.joshgm3z.bingo.game
 
-import androidx.compose.animation.animateColor
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animate
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -25,7 +16,8 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -35,17 +27,13 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.joshgm3z.bingo.R
 import com.joshgm3z.bingo.ui.ThemePreviews
 import com.joshgm3z.bingo.ui.theme.BingoTheme
 import com.joshgm3z.bingo.utils.Calculator.Companion.calculateStrikes
@@ -73,9 +61,10 @@ fun GamePreview() {
                 GameUiState(
                     myBoard = list.shuffled(),
                     opponentBoard = list2,
-                    player2Strikes = calculateStrikes(list2, calledNumbers),
+                    opponentStrikes = calculateStrikes(list2, calledNumbers),
                     calledNumbers = calledNumbers,
-                    strikes = calculateStrikes(list, calledNumbers)
+                    strikes = calculateStrikes(list, calledNumbers),
+                    gameOver = true
                 )
             )
         }
@@ -115,11 +104,9 @@ fun GameScreen(
                 .padding(it),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-//        Player2Board(gameState)
-//        Spacer(Modifier.size(20.dp))
-            BingoLogo(
-                enabled = gameState.isBingoButtonEnabled,
-                onBingoClick
+            ScoreBoard(
+                gameState,
+                onBingoClick,
             )
             Spacer(Modifier.size(20.dp))
             BingoText(gameState.strikes.size)
@@ -129,6 +116,21 @@ fun GameScreen(
             GameButtons(gameState, onStartClick)
             Spacer(Modifier.size(30.dp))
         }
+    }
+}
+
+@Composable
+fun ScoreBoard(
+    gameState: GameUiState,
+    onBingoClick: () -> Unit,
+) {
+    if (gameState.gameOver) {
+        Player2Board(gameState)
+    } else {
+        BingoLogo(
+            gameState,
+            onBingoClick
+        )
     }
 }
 
@@ -145,7 +147,7 @@ fun GameActionBar(
         navigationIcon = {
             IconButton(onClick = onCloseClick) {
                 Icon(
-                    Icons.Default.ArrowBack,
+                    Icons.Filled.Clear,
                     contentDescription = null
                 )
             }
@@ -156,29 +158,23 @@ fun GameActionBar(
 @Composable
 fun Player2Board(gameState: GameUiState) {
     if (gameState.opponentBoard.isEmpty()) return
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .background(
-                color = colorScheme.secondary,
-                shape = RoundedCornerShape(5.dp)
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Text("Opponent board")
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .padding(1.dp)
+        ) {
+            BingoText(gameState.opponentStrikes.size, 180)
+            Board(
+                gameState = gameState.copy(
+                    myBoard = gameState.opponentBoard,
+                    strikes = gameState.opponentStrikes
+                ),
+                onNumberClicked = {},
+                gameBoxSize = 180
             )
-            .padding(5.dp)
-    ) {
-        Text(
-            "Opponent board",
-            modifier = Modifier.padding(10.dp),
-            fontSize = 20.sp,
-            color = colorScheme.onSecondary
-        )
-        Board(
-            gameState = gameState.copy(
-                myBoard = gameState.opponentBoard,
-                strikes = gameState.player2Strikes
-            ),
-            onNumberClicked = {},
-            gameBoxSize = 200
-        )
+        }
     }
 }
 

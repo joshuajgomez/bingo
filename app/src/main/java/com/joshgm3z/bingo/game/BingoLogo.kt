@@ -23,20 +23,20 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.joshgm3z.bingo.R
-import com.joshgm3z.bingo.ui.ThemePreviews
+import com.joshgm3z.bingo.ui.DarkPreview
 import com.joshgm3z.bingo.ui.theme.BingoTheme
 
-@ThemePreviews
+@DarkPreview
 @Composable
 fun BingoLogoPreview() {
     BingoTheme {
-        BingoLogo()
+        BingoLogo(GameUiState(gameOver = true))
     }
 }
 
 @Composable
 fun BingoLogo(
-    enabled: Boolean = true,
+    gameUiState: GameUiState,
     onClick: () -> Unit = {},
 ) {
     val infiniteTransition = rememberInfiniteTransition(label = "infinite transition")
@@ -54,11 +54,11 @@ fun BingoLogo(
             .clip(shape = RoundedCornerShape(30.dp))
             .background(
                 color = when {
-                    enabled -> animatedColor
+                    gameUiState.isBingoButtonEnabled -> animatedColor
                     else -> Color.Gray.copy(alpha = 0.2f)
                 },
             )
-            .clickable(enabled = enabled) { onClick() },
+            .clickable(enabled = gameUiState.isBingoButtonEnabled) { onClick() },
         contentAlignment = Alignment.Center
     ) {
         Image(

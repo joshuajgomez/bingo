@@ -26,7 +26,7 @@ fun BingoTextPreview() {
 }
 
 @Composable
-fun BingoText(count: Int) {
+fun BingoText(count: Int, gameBoxSize: Int = 300) {
     LazyRow(
         Modifier.width(gameBoxSize.dp),
         horizontalArrangement = Arrangement.SpaceEvenly
@@ -34,7 +34,7 @@ fun BingoText(count: Int) {
         itemsIndexed("BINGO".toList()) { index, item ->
             Text(
                 item.toString(),
-                fontSize = 30.sp,
+                fontSize = (gameBoxSize / 10).sp,
                 modifier = Modifier
                     .width((gameBoxSize / 5).dp)
                     .background(

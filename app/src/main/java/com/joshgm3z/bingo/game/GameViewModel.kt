@@ -22,12 +22,11 @@ data class GameUiState(
     val isStartButtonEnabled: Boolean = true,
     val isBingoButtonEnabled: Boolean = false,
     val opponentBoard: List<Int> = listOf(),
-    val player2Strikes: List<Strike> = listOf(),
+    val opponentStrikes: List<Strike> = listOf(),
     val status: String = "New game",
     val gameOver: Boolean = false,
     val nextTurn: Int = 0,
-) {
-}
+)
 
 enum class Strike(vararg val indexes: Int) {
     None,
@@ -64,13 +63,14 @@ class GameViewModel
                     it.copy(
                         myBoard = bingoRoom.board(),
                         opponentBoard = bingoRoom.opponentBoard(),
+                        opponentStrikes = bingoRoom.oppnStrikes(),
                         calledNumbers = bingoRoom.calledNumbers,
                         strikes = strikes,
                         isBingoButtonEnabled = strikes.size >= 5 && bingoRoom.bingoPlayer == 0,
-                        isStartButtonEnabled = (bingoRoom.board().isEmpty() &&
-                                bingoRoom.opponentBoard().isEmpty()) || bingoRoom.bingoPlayer != 0,
+                        isStartButtonEnabled = bingoRoom.isNew() || bingoRoom.bingoPlayer != 0,
                         status = getStatus(bingoRoom),
-                        nextTurn = bingoRoom.nextTurn
+                        nextTurn = bingoRoom.nextTurn,
+                        gameOver = bingoRoom.bingoPlayer != 0
                     )
                 }
             }
@@ -105,6 +105,12 @@ class GameViewModel
         else -> listOf()
     }
 
+    private fun BingoRoom.oppnStrikes() = when (player) {
+        1 -> calculateStrikes(player2Board, calledNumbers)
+        2 -> calculateStrikes(player1Board, calledNumbers)
+        else -> listOf()
+    }
+
     private fun BingoRoom.board() = when (player) {
         1 -> player1Board
         2 -> player2Board
@@ -117,6 +123,8 @@ class GameViewModel
         else -> listOf()
     }
 
+    private fun BingoRoom.isNew() = this.board().isEmpty() && this.opponentBoard().isEmpty()
+
     fun callBingo() {
         gameRepository.callBingo(player)
     }
@@ -124,5 +132,8 @@ class GameViewModel
     fun resetGameClick() {
         gameRepository.resetGame()
     }
+
 }
+
+
 
