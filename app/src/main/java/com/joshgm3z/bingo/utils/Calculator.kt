@@ -14,9 +14,6 @@ class Calculator {
                     indexes.add(index)
                 }
             }
-            Logger.debug("allNumbers = [${allNumbers}]," +
-                    " calledNumbers = [${calledNumbers}]")
-            Logger.debug("indexes = [$indexes]")
             return Strike.entries.filter {
                 it != Strike.None && indexes.containsAll(it.indexes.toList())
             }

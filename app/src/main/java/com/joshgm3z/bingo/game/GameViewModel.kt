@@ -66,9 +66,9 @@ class GameViewModel
                         opponentBoard = bingoRoom.opponentBoard(),
                         calledNumbers = bingoRoom.calledNumbers,
                         strikes = strikes,
-                        isBingoButtonEnabled = strikes.size == 5 && bingoRoom.bingoPlayer == 0,
-                        /*isStartButtonEnabled = (bingoRoom.board().isEmpty() &&
-                                bingoRoom.opponentBoard().isEmpty()) || bingoRoom.bingoPlayer != 0,*/
+                        isBingoButtonEnabled = strikes.size >= 5 && bingoRoom.bingoPlayer == 0,
+                        isStartButtonEnabled = (bingoRoom.board().isEmpty() &&
+                                bingoRoom.opponentBoard().isEmpty()) || bingoRoom.bingoPlayer != 0,
                         status = getStatus(bingoRoom),
                         nextTurn = bingoRoom.nextTurn
                     )
@@ -81,7 +81,7 @@ class GameViewModel
     private fun getStatus(bingoRoom: BingoRoom): String = when {
         bingoRoom.bingoPlayer == player -> "$player You called bingo"
         bingoRoom.bingoPlayer > 0 -> "$player Opponent called bingo"
-        bingoRoom.strikes().size == 5 -> "$player Call bingo!"
+        bingoRoom.strikes().size >= 5 -> "$player Call bingo!"
         bingoRoom.nextTurn == player -> "$player Your turn"
         bingoRoom.nextTurn != player -> "$player Opponent turn"
         else -> "$player Start game"

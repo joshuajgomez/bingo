@@ -1,13 +1,18 @@
 package com.joshgm3z.bingo.game
 
-import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColor
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animate
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,7 +26,6 @@ import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -31,15 +35,13 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.tooling.preview.Devices
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -91,7 +93,7 @@ fun GameContainer(
         onNumberClicked = { gameViewModel.onNumberClicked(it) },
         onBingoClick = { gameViewModel.callBingo() },
         onStartClick = { gameViewModel.resetGameClick() },
-        onCloseClick = {},
+        onCloseClick = onCloseClick,
     )
 }
 
@@ -111,41 +113,22 @@ fun GameScreen(
             Modifier
                 .fillMaxSize()
                 .padding(it),
-            verticalArrangement = Arrangement.Bottom,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
 //        Player2Board(gameState)
 //        Spacer(Modifier.size(20.dp))
-            BingoLogo()
+            BingoLogo(
+                enabled = gameState.isBingoButtonEnabled,
+                onBingoClick
+            )
             Spacer(Modifier.size(20.dp))
             BingoText(gameState.strikes.size)
             Spacer(Modifier.size(10.dp))
             Board(gameState, onNumberClicked, gameBoxSize)
             Spacer(Modifier.size(10.dp))
-            GameButtons(gameState, onBingoClick, onStartClick)
+            GameButtons(gameState, onStartClick)
             Spacer(Modifier.size(30.dp))
         }
-    }
-}
-
-@Composable
-fun BingoLogo() {
-    Box(
-        Modifier
-            .padding(40.dp)
-            .fillMaxWidth()
-            .height(200.dp)
-            .background(
-                color = Color.Gray.copy(alpha = 0.2f),
-                shape = RoundedCornerShape(30.dp)
-            ),
-        contentAlignment = Alignment.Center
-    ) {
-        Image(
-            painter = painterResource(R.drawable.bingo_logo),
-            contentDescription = null,
-            contentScale = ContentScale.Crop
-        )
     }
 }
 
@@ -209,7 +192,7 @@ fun Board(
         columns = GridCells.Fixed(5),
         modifier = Modifier
             .width(gameBoxSize.dp)
-            .background(color = colorScheme.primary)
+            .background(color = colorScheme.onBackground)
     ) {
         itemsIndexed(gameState.myBoard) { index, item ->
             Box(

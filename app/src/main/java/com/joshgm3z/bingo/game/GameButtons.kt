@@ -30,7 +30,6 @@ fun GameButtonsPreview() {
 @Composable
 fun GameButtons(
     gameState: GameUiState,
-    onBingoClick: () -> Unit = {},
     onStartClick: () -> Unit = {},
 ) {
     Row(
@@ -40,20 +39,6 @@ fun GameButtons(
             .fillMaxWidth(0.8f)
     ) {
         val buttonMod = Modifier
-            .width(140.dp)
-            .height(40.dp)
-        Button(
-            onClick = onBingoClick,
-            modifier = buttonMod,
-            colors = ButtonDefaults.buttonColors().copy(
-                containerColor = colorScheme.primary
-            ),
-            enabled = gameState.isBingoButtonEnabled
-        ) {
-            Icon(Icons.Default.Star, contentDescription = null)
-            Spacer(Modifier.size(5.dp))
-            Text("Call Bingo")
-        }
         Button(
             onClick = onStartClick,
             modifier = buttonMod,
@@ -64,7 +49,7 @@ fun GameButtons(
         ) {
             Icon(Icons.Default.Refresh, contentDescription = null)
             Spacer(Modifier.size(5.dp))
-            Text("Start Game")
+            Text("New Game")
         }
     }
 }
